@@ -33,7 +33,7 @@ class CityController extends Controller
     {
         try {
             $this->validate($request, [
-                'name' => 'required|min:3|max:100',
+                'name' => 'required|unique:cities|min:3|max:100',
                 'state_id' => 'required|numeric'
             ]);
 
@@ -76,7 +76,7 @@ class CityController extends Controller
     {
         try {
             $this->validate($request, [
-                'name' => 'required|min:3|max:100',
+                'name' => 'required|unique:cities|min:3|max:100',
                 'state_id' => 'required|numeric'
             ]);
 
