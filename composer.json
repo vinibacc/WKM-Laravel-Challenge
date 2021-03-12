@@ -30,7 +30,7 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": ["laravel/dusk"]
         }
     },
     "autoload": {
@@ -59,4 +59,5 @@
             "@php artisan key:generate --ansi"
         ]
     }
+
 }
