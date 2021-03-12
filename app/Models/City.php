@@ -12,16 +12,17 @@ class City extends Model
 
     protected $fillable = [
         'id',
-        'name'
+        'name',
+        'state_id'
     ];
 
-    protected $hidden = ['created_at', 'updated_at','deleted_at'];
+    protected $hidden = ['state_id','created_at', 'updated_at','deleted_at'];
 
     /**
      * Get the state that owns the city.
      */
     public function state()
     {
-        return $this->belongsTo(State::class);
+        return $this->belongsTo('App\Models\State', 'state_id');
     }
 }

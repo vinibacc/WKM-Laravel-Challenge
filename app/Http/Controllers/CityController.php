@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use Illuminate\Http\Request;
+use Exception;
 
 class CityController extends Controller
 {
@@ -14,9 +15,12 @@ class CityController extends Controller
      */
     public function index()
     {
-        $data = City::paginate(5);
-
-        return response()->json(['success' => true, 'data' => $data], 200);
+        try {
+            $data = City::paginate(5);
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -27,17 +31,21 @@ class CityController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required|min:3|max:100',
-            'state_id' => 'required'
-        ]);
+        try {
+            $this->validate($request, [
+                'name' => 'required|min:3|max:100',
+                'state_id' => 'required|numeric'
+            ]);
 
-        $data = City::create([
-            'name' => $request->name,
-            'state_id' => $request->state_id
-        ]);
+            $data = City::create([
+                'name' => $request->name,
+                'state_id' => $request->state_id
+            ]);
 
-        return response()->json(['success' => true, 'data' => $data], 201);
+            return response()->json(['success' => true, 'data' => $data], 201);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -48,9 +56,13 @@ class CityController extends Controller
      */
     public function show($id)
     {
-        $data = City::find($id);
 
-        return response()->json(['success' => true, 'data' => $data], 200);
+        try {
+            $data = City::with('state')->findOrFail($id);
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     /**
@@ -62,11 +74,20 @@ class CityController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = City::find($id);
+        try {
+            $this->validate($request, [
+                'name' => 'required|min:3|max:100',
+                'state_id' => 'required|numeric'
+            ]);
 
-        $data->update($request->all());
+            $data = City::find($id);
 
-        return response()->json(['success' => true, 'data' => $data], 200);
+            $data->update($request->all());
+
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -77,8 +98,13 @@ class CityController extends Controller
      */
     public function destroy($id)
     {
-        City::find($id)->delete();
+        try {
+            City::findOrFail($id)->delete();
 
         return response()->json(['success' => true, 'data' => 'deleted'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
     }
 }

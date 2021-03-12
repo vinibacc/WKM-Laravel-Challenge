@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\State;
 use Illuminate\Http\Request;
+use Exception;
 
 class StateController extends Controller
 {
@@ -14,9 +15,12 @@ class StateController extends Controller
      */
     public function index()
     {
-        $data = State::paginate(5);
-
-        return response()->json(['success' => true, 'data' => $data], 200);
+        try {
+            $data = State::paginate(5);
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -27,17 +31,22 @@ class StateController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required|min:3|max:100',
-            'abbreviation' => 'required|min:0|max:3'
-        ]);
 
-        $data = State::create([
-            'name' => $request->name,
-            'abbreviation' => $request->abbreviation
-        ]);
+        try {
+            $this->validate($request, [
+                'name' => 'required|unique:states|min:3|max:100',
+                'abbreviation' => 'required|unique:states|min:0|max:3'
+            ]);
 
-        return response()->json(['success' => true, 'data' => $data], 200);
+            $data = State::create([
+                'name' => $request->name,
+                'abbreviation' => $request->abbreviation
+            ]);
+
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -48,9 +57,12 @@ class StateController extends Controller
      */
     public function show($id)
     {
-        $data = State::find($id);
-
-        return response()->json(['success' => true, 'data' => $data], 200);
+        try {
+            $data = State::findOrFail($id);
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -62,12 +74,19 @@ class StateController extends Controller
      */
     public function update(Request $request, $id)
     {
+        try {
+            $this->validate($request, [
+                'name' => 'required|unique:states|min:3|max:100',
+                'abbreviation' => 'required|unique:states|min:0|max:3'
+            ]);
 
-        $data = State::find($id);
+            $data = State::find($id);
 
-        $data->update($request->all());
-
-        return response()->json(['success' => true, 'data' => $data], 200);
+            $data->update($request->all());
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -78,8 +97,12 @@ class StateController extends Controller
      */
     public function destroy($id)
     {
-        State::find($id)->delete();
+        try {
+            State::find($id)->delete();
 
-        return response()->json(['success' => true, 'data' => 'deleted'], 200);
+            return response()->json(['success' => true, 'data' => 'deleted'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
